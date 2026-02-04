@@ -4,6 +4,7 @@ import { CarCard } from "@/components/cars/CarCard";
 import { cars, carTypes } from "@/data/cars";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Car, Sparkles, SlidersHorizontal } from "lucide-react";
 
 const Makina = () => {
   const [selectedType, setSelectedType] = useState("Të gjitha");
@@ -20,24 +21,48 @@ const Makina = () => {
 
   return (
     <Layout>
-      <section className="py-12 bg-muted/50">
-        <div className="container">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Makinat Tona
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 gradient-hero" />
+        <div className="absolute inset-0 bg-noise opacity-[0.03]" />
+        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px]" />
+        
+        <div className="container relative">
+          <div className="text-center max-w-3xl mx-auto animate-slide-up">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 text-sm font-medium mb-6">
+              <Sparkles className="h-4 w-4" />
+              Flota Premium
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              Zbuloni Flotën
+              <span className="gradient-text"> Ekskluzive</span>
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Zgjidhni makinën që i përshtatet më mirë nevojave tuaja nga flota
-              jonë e gjerë.
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              Zgjidhni nga koleksioni ynë i përzgjedhur i makinave premium për
+              çdo rast dhe çdo stil udhëtimi.
             </p>
           </div>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      </section>
 
+      {/* Main Content */}
+      <section className="py-12 -mt-16 relative z-10">
+        <div className="container">
           {/* Filters */}
-          <div className="bg-card rounded-2xl p-6 shadow-card mb-10">
+          <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg mb-10 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl gradient-primary">
+                <SlidersHorizontal className="h-5 w-5 text-white" />
+              </div>
+              <h2 className="font-display text-xl font-semibold">Filtrat</h2>
+            </div>
+            
             <div className="grid md:grid-cols-2 gap-8">
               {/* Type Filter */}
               <div>
-                <h3 className="font-semibold text-foreground mb-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">
                   Tipi i Makinës
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -47,6 +72,11 @@ const Makina = () => {
                       variant={selectedType === type ? "default" : "outline"}
                       size="sm"
                       onClick={() => setSelectedType(type)}
+                      className={`rounded-xl transition-all duration-300 ${
+                        selectedType === type
+                          ? "gradient-primary shadow-primary"
+                          : "hover:border-primary hover:text-primary"
+                      }`}
                     >
                       {type}
                     </Button>
@@ -56,24 +86,33 @@ const Makina = () => {
 
               {/* Price Filter */}
               <div>
-                <h3 className="font-semibold text-foreground mb-4">
-                  Çmimi për Ditë: €{priceRange[0]} - €{priceRange[1]}
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">
+                  Çmimi për Ditë
                 </h3>
-                <Slider
-                  min={0}
-                  max={150}
-                  step={5}
-                  value={priceRange}
-                  onValueChange={setPriceRange}
-                  className="w-full"
-                />
+                <div className="bg-muted/50 rounded-xl p-4">
+                  <div className="flex justify-between mb-3">
+                    <span className="text-sm font-medium">€{priceRange[0]}</span>
+                    <span className="text-sm font-medium">€{priceRange[1]}</span>
+                  </div>
+                  <Slider
+                    min={0}
+                    max={150}
+                    step={5}
+                    value={priceRange}
+                    onValueChange={setPriceRange}
+                    className="w-full"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Results */}
-          <div className="mb-6 text-muted-foreground">
-            {filteredCars.length} makina të gjetura
+          {/* Results count */}
+          <div className="flex items-center gap-2 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <Car className="h-5 w-5 text-primary" />
+            <span className="text-muted-foreground">
+              <span className="font-semibold text-foreground">{filteredCars.length}</span> makina të gjetura
+            </span>
           </div>
 
           {/* Cars Grid */}
@@ -84,9 +123,15 @@ const Makina = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                Nuk u gjetën makina me këto kritere. Provoni të ndryshoni filtrat.
+            <div className="text-center py-20">
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+                <Car className="h-10 w-10 text-muted-foreground" />
+              </div>
+              <h3 className="font-display text-xl font-semibold mb-2">
+                Nuk u gjetën makina
+              </h3>
+              <p className="text-muted-foreground">
+                Provoni të ndryshoni filtrat për të gjetur makinën e duhur.
               </p>
             </div>
           )}
