@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/select";
 import { cars } from "@/data/cars";
 import { toast } from "sonner";
-import { CheckCircle2, Calendar, User, Car } from "lucide-react";
+import {
+  CheckCircle2,
+  Calendar,
+  User,
+  Car,
+  Sparkles,
+  ArrowRight,
+  Shield,
+} from "lucide-react";
 
 interface FormData {
   firstName: string;
@@ -62,31 +70,25 @@ const Rezervim = () => {
     if (!formData.firstName.trim()) {
       newErrors.firstName = "Emri është i detyrueshëm";
     }
-
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Mbiemri është i detyrueshëm";
     }
-
     if (!formData.email.trim()) {
       newErrors.email = "Email-i është i detyrueshëm";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Email-i nuk është i vlefshëm";
     }
-
     if (!formData.phone.trim()) {
       newErrors.phone = "Numri i telefonit është i detyrueshëm";
     } else if (!/^[+]?[\d\s-]{8,}$/.test(formData.phone)) {
       newErrors.phone = "Numri i telefonit nuk është i vlefshëm";
     }
-
     if (!formData.carId) {
       newErrors.carId = "Ju lutem zgjidhni një makinë";
     }
-
     if (!formData.pickupDate) {
       newErrors.pickupDate = "Data e marrjes është e detyrueshme";
     }
-
     if (!formData.returnDate) {
       newErrors.returnDate = "Data e kthimit është e detyrueshme";
     } else if (
@@ -102,7 +104,6 @@ const Rezervim = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (validateForm()) {
       setSubmitted(true);
       toast.success("Rezervimi u dërgua me sukses!");
@@ -121,47 +122,57 @@ const Rezervim = () => {
   if (submitted) {
     return (
       <Layout>
-        <section className="py-20">
+        <section className="min-h-screen flex items-center py-20">
           <div className="container max-w-xl">
-            <div className="bg-card rounded-2xl p-8 shadow-card text-center animate-scale-in">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary mb-6">
-                <CheckCircle2 className="h-10 w-10" />
-              </div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-4">
-                Rezervimi u Dërgua!
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Faleminderit për rezervimin tuaj. Do t'ju kontaktojmë së shpejti
-                për të konfirmuar rezervimin.
-              </p>
-              <div className="bg-muted rounded-xl p-6 text-left">
-                <h3 className="font-semibold mb-4">Detajet e Rezervimit:</h3>
-                <div className="space-y-2 text-sm">
-                  <p>
-                    <span className="text-muted-foreground">Emri:</span>{" "}
-                    {formData.firstName} {formData.lastName}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Makina:</span>{" "}
-                    {selectedCar?.name}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Marrja:</span>{" "}
-                    {formData.pickupDate}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Kthimi:</span>{" "}
-                    {formData.returnDate}
-                  </p>
+            <div className="bg-card rounded-3xl p-10 shadow-xl text-center animate-scale-in relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
+              
+              <div className="relative">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full gradient-primary shadow-primary mb-8">
+                  <CheckCircle2 className="h-12 w-12 text-white" />
                 </div>
+                
+                <h2 className="font-display text-3xl font-bold text-foreground mb-4">
+                  Rezervimi u Pranua!
+                </h2>
+                <p className="text-muted-foreground mb-8 text-lg">
+                  Ekipi ynë do t'ju kontaktojë brenda 30 minutave për të
+                  konfirmuar rezervimin.
+                </p>
+                
+                <div className="bg-muted/50 rounded-2xl p-6 text-left mb-8">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-primary" />
+                    Detajet e Rezervimit
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Emri</span>
+                      <span className="font-medium">{formData.firstName} {formData.lastName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Makina</span>
+                      <span className="font-medium">{selectedCar?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Marrja</span>
+                      <span className="font-medium">{formData.pickupDate}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Kthimi</span>
+                      <span className="font-medium">{formData.returnDate}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button
+                  onClick={() => setSubmitted(false)}
+                  variant="outline"
+                  className="rounded-xl"
+                >
+                  Bëj Rezervim Tjetër
+                </Button>
               </div>
-              <Button
-                onClick={() => setSubmitted(false)}
-                variant="outline"
-                className="mt-6"
-              >
-                Bëj Rezervim Tjetër
-              </Button>
             </div>
           </div>
         </section>
@@ -171,30 +182,47 @@ const Rezervim = () => {
 
   return (
     <Layout>
-      <section className="py-12 bg-muted/50">
-        <div className="container max-w-4xl">
-          <div className="text-center mb-12">
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Rezervo Makinën
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute inset-0 gradient-hero" />
+        <div className="absolute inset-0 bg-noise opacity-[0.03]" />
+        <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[120px]" />
+        
+        <div className="container relative">
+          <div className="text-center max-w-3xl mx-auto animate-slide-up">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-white/80 text-sm font-medium mb-6">
+              <Sparkles className="h-4 w-4" />
+              Rezervim i Shpejtë
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              Rezervoni
+              <span className="gradient-text"> Makinën</span> Tuaj
             </h1>
-            <p className="text-muted-foreground text-lg">
-              Plotësoni formularin për të rezervuar makinën tuaj të preferuar.
+            <p className="text-white/60 text-lg">
+              Plotësoni formularin dhe do t'ju kontaktojmë brenda 30 minutave.
             </p>
           </div>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      </section>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Form */}
+      <section className="py-12 -mt-16 relative z-10">
+        <div className="container max-w-4xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Personal Info */}
-            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-card">
+            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg animate-slide-up" style={{ animationDelay: '0.1s' }}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <User className="h-5 w-5" />
+                <div className="p-2.5 rounded-xl gradient-primary shadow-primary">
+                  <User className="h-5 w-5 text-white" />
                 </div>
                 <h2 className="font-display text-xl font-semibold">
                   Të Dhënat Personale
                 </h2>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">Emri *</Label>
                   <Input
@@ -202,7 +230,7 @@ const Rezervim = () => {
                     value={formData.firstName}
                     onChange={(e) => handleChange("firstName", e.target.value)}
                     placeholder="Shkruani emrin"
-                    className={errors.firstName ? "border-destructive" : ""}
+                    className={`h-12 rounded-xl ${errors.firstName ? "border-destructive" : ""}`}
                   />
                   {errors.firstName && (
                     <p className="text-sm text-destructive">{errors.firstName}</p>
@@ -216,7 +244,7 @@ const Rezervim = () => {
                     value={formData.lastName}
                     onChange={(e) => handleChange("lastName", e.target.value)}
                     placeholder="Shkruani mbiemrin"
-                    className={errors.lastName ? "border-destructive" : ""}
+                    className={`h-12 rounded-xl ${errors.lastName ? "border-destructive" : ""}`}
                   />
                   {errors.lastName && (
                     <p className="text-sm text-destructive">{errors.lastName}</p>
@@ -231,7 +259,7 @@ const Rezervim = () => {
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     placeholder="email@shembull.com"
-                    className={errors.email ? "border-destructive" : ""}
+                    className={`h-12 rounded-xl ${errors.email ? "border-destructive" : ""}`}
                   />
                   {errors.email && (
                     <p className="text-sm text-destructive">{errors.email}</p>
@@ -246,7 +274,7 @@ const Rezervim = () => {
                     value={formData.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     placeholder="+355 69 123 4567"
-                    className={errors.phone ? "border-destructive" : ""}
+                    className={`h-12 rounded-xl ${errors.phone ? "border-destructive" : ""}`}
                   />
                   {errors.phone && (
                     <p className="text-sm text-destructive">{errors.phone}</p>
@@ -256,10 +284,10 @@ const Rezervim = () => {
             </div>
 
             {/* Car Selection */}
-            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-card">
+            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <Car className="h-5 w-5" />
+                <div className="p-2.5 rounded-xl gradient-primary shadow-primary">
+                  <Car className="h-5 w-5 text-white" />
                 </div>
                 <h2 className="font-display text-xl font-semibold">
                   Zgjedhja e Makinës
@@ -272,14 +300,12 @@ const Rezervim = () => {
                   value={formData.carId}
                   onValueChange={(value) => handleChange("carId", value)}
                 >
-                  <SelectTrigger
-                    className={errors.carId ? "border-destructive" : ""}
-                  >
+                  <SelectTrigger className={`h-12 rounded-xl ${errors.carId ? "border-destructive" : ""}`}>
                     <SelectValue placeholder="Zgjidhni makinën" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-xl">
                     {cars.map((car) => (
-                      <SelectItem key={car.id} value={car.id.toString()}>
+                      <SelectItem key={car.id} value={car.id.toString()} className="rounded-lg">
                         {car.name} - €{car.price}/ditë
                       </SelectItem>
                     ))}
@@ -291,20 +317,19 @@ const Rezervim = () => {
               </div>
 
               {selectedCar && (
-                <div className="mt-6 p-4 bg-muted rounded-xl">
-                  <div className="flex gap-4">
+                <div className="mt-6 p-5 bg-muted/50 rounded-xl border border-border">
+                  <div className="flex gap-5">
                     <img
                       src={selectedCar.image}
                       alt={selectedCar.name}
-                      className="w-24 h-16 object-cover rounded-lg"
+                      className="w-28 h-20 object-cover rounded-xl"
                     />
-                    <div>
-                      <h3 className="font-semibold">{selectedCar.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedCar.type} • {selectedCar.seats} ulëse •{" "}
-                        {selectedCar.transmission}
+                    <div className="flex-1">
+                      <h3 className="font-display font-semibold text-lg">{selectedCar.name}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {selectedCar.type} • {selectedCar.seats} ulëse • {selectedCar.transmission}
                       </p>
-                      <p className="text-primary font-bold">
+                      <p className="font-display text-xl font-bold gradient-text">
                         €{selectedCar.price}/ditë
                       </p>
                     </div>
@@ -314,17 +339,17 @@ const Rezervim = () => {
             </div>
 
             {/* Dates */}
-            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-card">
+            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                  <Calendar className="h-5 w-5" />
+                <div className="p-2.5 rounded-xl gradient-primary shadow-primary">
+                  <Calendar className="h-5 w-5 text-white" />
                 </div>
                 <h2 className="font-display text-xl font-semibold">
                   Datat e Rezervimit
                 </h2>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <Label htmlFor="pickupDate">Data e Marrjes *</Label>
                   <Input
@@ -333,7 +358,7 @@ const Rezervim = () => {
                     value={formData.pickupDate}
                     onChange={(e) => handleChange("pickupDate", e.target.value)}
                     min={new Date().toISOString().split("T")[0]}
-                    className={errors.pickupDate ? "border-destructive" : ""}
+                    className={`h-12 rounded-xl ${errors.pickupDate ? "border-destructive" : ""}`}
                   />
                   {errors.pickupDate && (
                     <p className="text-sm text-destructive">{errors.pickupDate}</p>
@@ -348,7 +373,7 @@ const Rezervim = () => {
                     value={formData.returnDate}
                     onChange={(e) => handleChange("returnDate", e.target.value)}
                     min={formData.pickupDate || new Date().toISOString().split("T")[0]}
-                    className={errors.returnDate ? "border-destructive" : ""}
+                    className={`h-12 rounded-xl ${errors.returnDate ? "border-destructive" : ""}`}
                   />
                   {errors.returnDate && (
                     <p className="text-sm text-destructive">{errors.returnDate}</p>
@@ -357,8 +382,14 @@ const Rezervim = () => {
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full shadow-hover">
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full gradient-primary shadow-primary hover:shadow-glow transition-all duration-300 rounded-xl h-14 text-base shine-effect group animate-slide-up"
+              style={{ animationDelay: '0.4s' }}
+            >
               Dërgo Rezervimin
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </form>
         </div>
