@@ -14,7 +14,143 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cars: {
+        Row: {
+          available: boolean
+          brand: string
+          created_at: string
+          description: string | null
+          fuel: string
+          id: string
+          image: string
+          name: string
+          price: number
+          seats: number
+          transmission: string
+          type: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          available?: boolean
+          brand: string
+          created_at?: string
+          description?: string | null
+          fuel?: string
+          id?: string
+          image: string
+          name: string
+          price: number
+          seats?: number
+          transmission?: string
+          type: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          available?: boolean
+          brand?: string
+          created_at?: string
+          description?: string | null
+          fuel?: string
+          id?: string
+          image?: string
+          name?: string
+          price?: number
+          seats?: number
+          transmission?: string
+          type?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          read: boolean
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          read?: boolean
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          read?: boolean
+          subject?: string
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          car_id: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          notes: string | null
+          pickup_date: string
+          pickup_location: string
+          return_date: string
+          status: string
+          total_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          id?: string
+          notes?: string | null
+          pickup_date: string
+          pickup_location: string
+          return_date: string
+          status?: string
+          total_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          notes?: string | null
+          pickup_date?: string
+          pickup_location?: string
+          return_date?: string
+          status?: string
+          total_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
