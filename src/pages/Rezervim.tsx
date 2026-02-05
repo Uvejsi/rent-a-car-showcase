@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cars } from "@/data/cars";
+import { useCars, Car } from "@/hooks/useCars";
+import { useCreateReservation } from "@/hooks/useReservations";
+import { cars as fallbackCars } from "@/data/cars";
 import { toast } from "sonner";
 import {
   CheckCircle2,
   Calendar,
   User,
-  Car,
+  Car as CarIcon,
   Sparkles,
   ArrowRight,
   Shield,
+  Loader2,
 } from "lucide-react";
 
 interface FormData {
@@ -46,6 +49,7 @@ interface FormErrors {
 const Rezervim = () => {
   const [searchParams] = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -56,6 +60,21 @@ const Rezervim = () => {
     returnDate: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  
+  const { data: dbCars } = useCars();
+  const createReservation = useCreateReservation();
+  
+  const allCars = useMemo(() => {
+    if (dbCars && dbCars.length > 0) {
+      return dbCars;
+    }
+    return fallbackCars.map(car => ({
+      ...car,
+      id: car.id.toString(),
+      available: true,
+      description: null
+    })) as Car[];
+  }, [dbCars]);
 
   useEffect(() => {
     const makinaId = searchParams.get("makina");
@@ -102,11 +121,36 @@ const Rezervim = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      setSubmitted(true);
-      toast.success("Rezervimi u dërgua me sukses!");
+      setIsSubmitting(true);
+      try {
+        const selectedCar = allCars.find((c) => c.id === formData.carId);
+        const days = Math.ceil(
+          (new Date(formData.returnDate).getTime() - new Date(formData.pickupDate).getTime()) / (1000 * 60 * 60 * 24)
+        );
+        const totalPrice = selectedCar ? selectedCar.price * days : 0;
+        
+        await createReservation.mutateAsync({
+          car_id: formData.carId,
+          customer_name: `${formData.firstName} ${formData.lastName}`,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          pickup_date: formData.pickupDate,
+          return_date: formData.returnDate,
+          pickup_location: "Tiranë",
+          total_price: totalPrice,
+        });
+        
+        setSubmitted(true);
+        toast.success("Rezervimi u dërgua me sukses!");
+      } catch (error) {
+        console.error("Error submitting reservation:", error);
+        toast.error("Ndodhi një gabim. Ju lutem provoni përsëri.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -117,7 +161,7 @@ const Rezervim = () => {
     }
   };
 
-  const selectedCar = cars.find((c) => c.id.toString() === formData.carId);
+  const selectedCar = allCars.find((c) => c.id === formData.carId);
 
   if (submitted) {
     return (
@@ -287,7 +331,7 @@ const Rezervim = () => {
             <div className="bg-card rounded-2xl p-6 md:p-8 shadow-lg animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2.5 rounded-xl gradient-primary shadow-primary">
-                  <Car className="h-5 w-5 text-white" />
+                  <CarIcon className="h-5 w-5 text-white" />
                 </div>
                 <h2 className="font-display text-xl font-semibold">
                   Zgjedhja e Makinës
@@ -304,8 +348,8 @@ const Rezervim = () => {
                     <SelectValue placeholder="Zgjidhni makinën" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
-                    {cars.map((car) => (
-                      <SelectItem key={car.id} value={car.id.toString()} className="rounded-lg">
+                    {allCars.map((car) => (
+                      <SelectItem key={car.id} value={car.id} className="rounded-lg">
                         {car.name} - €{car.price}/ditë
                       </SelectItem>
                     ))}
@@ -385,11 +429,21 @@ const Rezervim = () => {
             <Button
               type="submit"
               size="lg"
+              disabled={isSubmitting}
               className="w-full gradient-primary shadow-primary hover:shadow-glow transition-all duration-300 rounded-xl h-14 text-base shine-effect group animate-slide-up"
               style={{ animationDelay: '0.4s' }}
             >
-              Dërgo Rezervimin
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Duke dërguar...
+                </>
+              ) : (
+                <>
+                  Dërgo Rezervimin
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
             </Button>
           </form>
         </div>

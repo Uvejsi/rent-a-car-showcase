@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useCreateContactMessage } from "@/hooks/useContactMessages";
 import { toast } from "sonner";
 import {
   Phone,
@@ -12,9 +13,9 @@ import {
   Clock,
   Send,
   CheckCircle2,
-  Sparkles,
   ArrowRight,
   MessageCircle,
+  Loader2,
 } from "lucide-react";
 
 interface FormData {
@@ -33,6 +34,7 @@ interface FormErrors {
 
 const Kontakt = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -40,6 +42,8 @@ const Kontakt = () => {
     message: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  
+  const createContactMessage = useCreateContactMessage();
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -65,11 +69,20 @@ const Kontakt = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      setSubmitted(true);
-      toast.success("Mesazhi u dërgua me sukses!");
+      setIsSubmitting(true);
+      try {
+        await createContactMessage.mutateAsync(formData);
+        setSubmitted(true);
+        toast.success("Mesazhi u dërgua me sukses!");
+      } catch (error) {
+        console.error("Error sending message:", error);
+        toast.error("Ndodhi një gabim. Ju lutem provoni përsëri.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -268,10 +281,20 @@ const Kontakt = () => {
                   <Button
                     type="submit"
                     size="lg"
+                    disabled={isSubmitting}
                     className="w-full gradient-primary shadow-primary hover:shadow-glow transition-all duration-300 rounded-xl h-14 shine-effect group"
                   >
-                    Dërgo Mesazhin
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Duke dërguar...
+                      </>
+                    ) : (
+                      <>
+                        Dërgo Mesazhin
+                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
                   </Button>
                 </form>
               )}

@@ -1,11 +1,25 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CarCard } from "@/components/cars/CarCard";
-import { cars } from "@/data/cars";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { useCars, Car } from "@/hooks/useCars";
+import { cars as fallbackCars } from "@/data/cars";
+import { ArrowRight, Sparkles, Loader2 } from "lucide-react";
+import { useMemo } from "react";
 
 export const FeaturedCars = () => {
-  const featuredCars = cars.slice(0, 4);
+  const { data: dbCars, isLoading } = useCars();
+  
+  const featuredCars = useMemo(() => {
+    if (dbCars && dbCars.length > 0) {
+      return dbCars.slice(0, 4);
+    }
+    return fallbackCars.slice(0, 4).map(car => ({
+      ...car,
+      id: car.id.toString(),
+      available: true,
+      description: null
+    })) as Car[];
+  }, [dbCars]);
 
   return (
     <section className="py-24 lg:py-32 bg-muted/30 relative overflow-hidden">
@@ -37,9 +51,19 @@ export const FeaturedCars = () => {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredCars.map((car, index) => (
-            <CarCard key={car.id} car={car} index={index} />
-          ))}
+          {isLoading ? (
+            [1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-card rounded-2xl p-4 animate-pulse">
+                <div className="aspect-[4/3] bg-muted rounded-xl mb-4" />
+                <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                <div className="h-4 bg-muted rounded w-1/2" />
+              </div>
+            ))
+          ) : (
+            featuredCars.map((car, index) => (
+              <CarCard key={car.id} car={car} index={index} />
+            ))
+          )}
         </div>
 
         {/* CTA Section */}
