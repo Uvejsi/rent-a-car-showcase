@@ -1,23 +1,39 @@
 import { useState, useMemo } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { CarCard } from "@/components/cars/CarCard";
-import { cars, carTypes } from "@/data/cars";
+import { useCars, carTypes, Car } from "@/hooks/useCars";
+import { cars as fallbackCars } from "@/data/cars";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Car, Sparkles, SlidersHorizontal } from "lucide-react";
+import { Car as CarIcon, Sparkles, SlidersHorizontal, Loader2 } from "lucide-react";
 
 const Makina = () => {
   const [selectedType, setSelectedType] = useState("Të gjitha");
   const [priceRange, setPriceRange] = useState([0, 150]);
+  
+  const { data: dbCars, isLoading } = useCars();
+  
+  // Use database cars if available, otherwise fallback to static data
+  const allCars = useMemo(() => {
+    if (dbCars && dbCars.length > 0) {
+      return dbCars;
+    }
+    return fallbackCars.map(car => ({
+      ...car,
+      id: car.id.toString(),
+      available: true,
+      description: null
+    })) as Car[];
+  }, [dbCars]);
 
   const filteredCars = useMemo(() => {
-    return cars.filter((car) => {
+    return allCars.filter((car) => {
       const typeMatch =
         selectedType === "Të gjitha" || car.type === selectedType;
       const priceMatch = car.price >= priceRange[0] && car.price <= priceRange[1];
       return typeMatch && priceMatch;
     });
-  }, [selectedType, priceRange]);
+  }, [allCars, selectedType, priceRange]);
 
   return (
     <Layout>
@@ -109,14 +125,33 @@ const Makina = () => {
 
           {/* Results count */}
           <div className="flex items-center gap-2 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <Car className="h-5 w-5 text-primary" />
+            <CarIcon className="h-5 w-5 text-primary" />
             <span className="text-muted-foreground">
-              <span className="font-semibold text-foreground">{filteredCars.length}</span> makina të gjetura
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Duke ngarkuar...
+                </span>
+              ) : (
+                <>
+                  <span className="font-semibold text-foreground">{filteredCars.length}</span> makina të gjetura
+                </>
+              )}
             </span>
           </div>
 
           {/* Cars Grid */}
-          {filteredCars.length > 0 ? (
+          {isLoading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-card rounded-2xl p-4 animate-pulse">
+                  <div className="aspect-[4/3] bg-muted rounded-xl mb-4" />
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-muted rounded w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : filteredCars.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCars.map((car, index) => (
                 <CarCard key={car.id} car={car} index={index} />
@@ -125,7 +160,7 @@ const Makina = () => {
           ) : (
             <div className="text-center py-20">
               <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
-                <Car className="h-10 w-10 text-muted-foreground" />
+                <CarIcon className="h-10 w-10 text-muted-foreground" />
               </div>
               <h3 className="font-display text-xl font-semibold mb-2">
                 Nuk u gjetën makina

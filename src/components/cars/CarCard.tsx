@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Car } from "@/data/cars";
+import { Car } from "@/hooks/useCars";
 import { Users, Fuel, Settings, ArrowRight } from "lucide-react";
 
 interface CarCardProps {
