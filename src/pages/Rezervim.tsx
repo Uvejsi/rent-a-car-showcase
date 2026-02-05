@@ -126,11 +126,11 @@ const Rezervim = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        const selectedCar = allCars.find((c) => c.id === formData.carId);
+        const selectedCarData = allCars.find((c) => c.id === formData.carId);
         const days = Math.ceil(
           (new Date(formData.returnDate).getTime() - new Date(formData.pickupDate).getTime()) / (1000 * 60 * 60 * 24)
         );
-        const totalPrice = selectedCar ? selectedCar.price * days : 0;
+        const totalPrice = selectedCarData ? selectedCarData.price * days : 0;
         
         await createReservation.mutateAsync({
           car_id: formData.carId,
@@ -141,6 +141,8 @@ const Rezervim = () => {
           return_date: formData.returnDate,
           pickup_location: "Tiranë",
           total_price: totalPrice,
+          car_name: selectedCarData?.name,
+          car_brand: selectedCarData?.brand,
         });
         
         setSubmitted(true);
